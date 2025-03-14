@@ -25,7 +25,12 @@ SECRET_KEY = 'django-insecure-$&4869d=+)jq+7^*(dj90*cu1py^n0nwk-a1hei-+1o32o9w+n
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = [
+    "localhost",
+    "127.0.0.1",
+    "auth-service-api",
+    "172.18.0.5",
+]
 
 
 # Application definition
@@ -37,7 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'auth_service',
+    'src',
 ]
 
 CSRF_COOKIE_SECURE = False
@@ -52,7 +57,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'config.urls'
+ROOT_URLCONF = 'src.urls'
 
 TEMPLATES = [
     {
@@ -70,7 +75,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'config.wsgi.application'
+WSGI_APPLICATION = 'src.wsgi.application'
 
 
 # Database
@@ -123,7 +128,3 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
-
-# MongoDB settings
-MONGO_DB = 'auth_db'
-MONGO_URI = 'mongodb://localhost:27017/'  # Assuming local MongoDB instance

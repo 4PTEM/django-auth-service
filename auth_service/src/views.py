@@ -49,10 +49,22 @@ class AuthView(View):
         auth_header = request.headers.get('Authorization')
         if not auth_header:
             return JsonResponse({"error": "Authorization header missing"}, status=403)
-
-        token = auth_header.split(" ")[1]  # Extract the token from "Bearer <token>"
-        payload = validate_jwt(token)
-        if payload:
-            return JsonResponse({"message": "Authenticated"}, status=200)
-        else:
-            return JsonResponse({"error": "Invalid or expired token"}, status=403)
+        
+        try:
+            token = auth_header.split(" ")[1]
+            payload = validate_jwt(token)
+            
+            if payload:
+                user_id = payload.get('user_id')
+                user = User.objects.get(id=user_id)
+                
+                response = JsonResponse({"message": "Authenticated"}, status=200)
+                
+                response['X-USER-ROLE'] = user.role if hasattr(user, 'role') else 'user'
+                response['Authorization'] = auth_header
+                
+                return response
+            else:
+                return JsonResponse({"error": "Invalid or expired token"}, status=403)
+        except Exception as e:
+            return JsonResponse({"error": f"Authentication error: {str(e)}"}, status=403)

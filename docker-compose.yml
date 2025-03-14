@@ -1,0 +1,67 @@
+version: "3.8"
+services:
+    auth-service-api:
+        container_name: auth-service-api
+        build: ./auth_service
+        depends_on:
+            - auth-service-mongodb
+        labels:
+            - "traefik.http.routers.auth-service-api.rule=Host(`localhost`) && PathPrefix(`/`)"
+            - "traefik.http.routers.auth-service-api.entrypoints=web"
+            - "traefik.http.services.auth-service-api.loadbalancer.server.port=80"
+        networks:
+            - auth-network
+
+    auth-service-mongodb:
+        image: mongo:latest
+        container_name: auth-service-mongodb
+        restart: always
+        ports:
+            - "27017:27017"
+        environment:
+            MONGO_INITDB_ROOT_USERNAME: "auth-service-user"
+            MONGO_INITDB_ROOT_PASSWORD: "12345678"
+            MONGO_INITDB_DATABASE: "auth_db"
+        volumes:
+            - auth-service-mongodb-volume:/data/db
+        networks:
+            - auth-network
+
+    auth-service-reverse-proxy:
+        image: traefik:v3.3
+        container_name: auth-service-reverse-proxy
+        command:
+            - "--api.insecure=true"
+            - "--providers.docker"
+            - "--entrypoints.web.address=:80"
+            - "--accesslog=true"
+        ports:
+            - "80:80"
+            - "8080:8080"
+        volumes:
+            - /var/run/docker.sock:/var/run/docker.sock
+        labels:
+            - "traefik.http.middlewares.forward-auth-middleware.forwardauth.address=http://auth-service-api/auth/"
+            - "traefik.http.middlewares.forward-auth-middleware.forwardauth.trustForwardHeader=true"
+            - "traefik.http.middlewares.forward-auth-middleware.forwardauth.authResponseHeaders=Authorization,X-USER-ROLE"
+        networks:
+            - auth-network
+            
+    auth-service-whoami:
+        image: traefik/whoami
+        container_name: auth-service-whoami
+        environment:
+            - WHOAMI_HEADERS=true
+        labels:
+            - "traefik.http.routers.auth-service-whoami.rule=Host(`whoami.localhost`)"
+            - "traefik.http.routers.auth-service-whoami.entryPoints=web"
+            - "traefik.http.routers.auth-service-whoami.middlewares=forward-auth-middleware"
+        networks:
+            - auth-network
+
+networks:
+    auth-network:
+        driver: bridge
+
+volumes:
+    auth-service-mongodb-volume:
