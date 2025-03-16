@@ -1,0 +1,30 @@
+services:
+  events-service-api:
+    container_name: events-service-api
+    build: .
+    restart: always
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.events-service-api.rule=Host(`localhost`) && PathPrefix(`/events-service-api/`)"
+      - "traefik.http.routers.events-service-api.entryPoints=web"
+      - "traefik.http.routers.events-service-api.middlewares=forward-auth-middleware@docker"
+      - "traefik.http.services.events-service-api.loadbalancer.server.port=80"
+    networks:
+      - shared-network
+    depends_on:
+      - events-service-postgresql
+  
+  events-service-postgresql:
+    container_name: events-service-postgresql
+    image: postgres:latest
+    restart: always
+    expose:
+      - "5432"
+    environment:
+      POSTGRES_USER: "${POSTGRESQL_USERNAME}"
+      POSTGRES_PASSWORD: "${POSTGRESQL_PASSWORD}"
+      POSTGRES_DB: "${POSTGRESQL_DBNAME}"
+    volumes:
+      - events-service-postgresql-volume:/var/lib/postgresql/data
+    networks:
+      - shared-network

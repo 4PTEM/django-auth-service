@@ -26,10 +26,7 @@ SECRET_KEY = 'django-insecure-$&4869d=+)jq+7^*(dj90*cu1py^n0nwk-a1hei-+1o32o9w+n
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "localhost",
-    "127.0.0.1",
-    "auth-service-api",
-    "172.18.0.5",
+    '*'
 ]
 
 
@@ -42,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'src',
+    'app',
 ]
 
 CSRF_COOKIE_SECURE = False
@@ -57,7 +54,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'src.urls'
+ROOT_URLCONF = 'app.urls'
 
 TEMPLATES = [
     {
@@ -75,7 +72,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'src.wsgi.application'
+WSGI_APPLICATION = 'app.wsgi.application'
 
 
 # Database

@@ -4,7 +4,7 @@ import os
 from dotenv import load_dotenv
 
 class AuthConfig(AppConfig):
-    name = 'src'
+    name = 'app'
 
     def ready(self):
         env_path = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".env"))
@@ -19,5 +19,6 @@ class AuthConfig(AppConfig):
 
         print(f"Connecting to MongoDB at {host}:{port} as {username} with password {password} for database {db}")
 
-        connect(host=f"mongodb://{username}:{password}@{host}:{port}/{db}?authSource=admin")
+        connect(host=f"mongodb://{username}:{password}@{host}:{port}/{db}?authSource=admin", timeoutms=1000)
 
+        print("Connected to MongoDB")
